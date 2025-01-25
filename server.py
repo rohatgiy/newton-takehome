@@ -5,10 +5,10 @@ import websockets
 import json
 import requests
 import time
+import argparse
 
 load_dotenv()
 KRAKEN_URI = os.getenv('KRAKEN_URI')
-REFETCH_INTERVAL = 10
 
 assets = [
 	"BTC", "ETH", "LTC", "XRP", "BCH", "USDC", "XMR", "XLM",
@@ -34,6 +34,7 @@ prev_prices = {}
 last_fetch = 0
 
 def get_prices():
+	print(REFETCH_INTERVAL)
 	global last_fetch
 	timestamp = time.time()
 	if timestamp - last_fetch <= REFETCH_INTERVAL:
@@ -121,5 +122,9 @@ async def main():
 	await asyncio.gather(start_server.wait_closed(), broadcast_updates())
 
 if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='WebSocket server for real-time crypto prices')
+	parser.add_argument('--interval', type=int, default=10, help='Interval for fetching prices in seconds')
+	args = parser.parse_args()
+	REFETCH_INTERVAL = args.interval
 	asyncio.run(main())
 	
